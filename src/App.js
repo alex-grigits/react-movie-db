@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import { Switch, Route } from 'react-router-dom';
 
 // custom components
 import SearchBar from './components/SearchBar/SearchBar';
@@ -29,25 +30,26 @@ class App extends PureComponent {
     searchedMovies: [],
     page: 1,
     total_pages: 1,
-    isLatestMoviesDisplay: true
+    isLatestMoviesDisplay: true,
+    searchInputYear: ''
   };
 
   componentDidMount() {
     this.getLatestMovies();
   }
 
-  handleInput = event => {
+  handleInput = (event, key) => {
     this.setState({
-      inputValue: event.target.value
+      [key]: event.target.value
     });
   };
 
-  handleKeyDown = event => {
+  handleKeyDown = (event, key) => {
     console.log(this.state.inputValue);
     if (event.keyCode === 13 && this.state.inputValue !== '') {
       this.setState(
         {
-          inputValue: event.target.value,
+          [key]: event.target.value,
           page: 1
         },
         () => this.getMoviesByTitle()
@@ -59,7 +61,9 @@ class App extends PureComponent {
     fetch(
       `https://api.themoviedb.org/3/search/movie?api_key=5874acfd11651a28c55771624f7021f4&language=en-US&query=${
         this.state.inputValue
-      }&page=${this.state.page}`
+      }&page=${this.state.page}&primary_release_year=${
+        this.state.searchInputYear
+      }&year_optional=true`
     )
       .then(res => res.json())
       .then(data => {
@@ -122,17 +126,25 @@ class App extends PureComponent {
   };
 
   render() {
-    const { inputValue, searchedMovies, page, total_pages } = this.state;
+    const {
+      inputValue,
+      searchedMovies,
+      page,
+      total_pages,
+      searchInputYear
+    } = this.state;
 
     return (
       <div className="App">
         <header className="App-header">
           <h1 className="App-title">Movie search DB</h1>
         </header>
+
         <div className="search-bar-container">
           <SearchBar
             handleInput={this.handleInput}
             inputValue={inputValue}
+            yearValue={searchInputYear}
             handleKeyDown={this.handleKeyDown}
           />
         </div>

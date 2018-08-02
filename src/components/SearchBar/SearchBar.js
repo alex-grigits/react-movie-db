@@ -5,17 +5,25 @@ import './SearchBar.css';
 
 class SearchBar extends React.Component {
   render() {
-    const { inputValue, handleInput, handleKeyDown } = this.props;
+    const { inputValue, yearValue, handleInput, handleKeyDown } = this.props;
 
     return (
       <div>
         <input
           type="text"
           value={inputValue}
-          onInput={handleInput}
-          onKeyDown={handleKeyDown}
+          onInput={e => handleInput(e, 'inputValue')}
+          onKeyDown={e => handleKeyDown(e, 'inputValue')}
           placeholder="Enter the movie title for search"
           required
+        />
+        <input
+          type="number"
+          value={yearValue}
+          onInput={e => handleInput(e, 'searchInputYear')}
+          onKeyDown={e => handleKeyDown(e, 'searchInputYear')}
+          min="1874"
+          max="2026"
         />
       </div>
     );

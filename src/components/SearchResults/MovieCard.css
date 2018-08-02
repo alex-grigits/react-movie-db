@@ -1,6 +1,15 @@
 .card {
+    display: flex;
     width: 400px;
     margin-top: 15px;
     background-color: #ccc;
     border: 1px solid #000;
+}
+
+.poster img {
+    height: 100%;
+}
+
+.info {
+    flex: 2;
 }
