@@ -3,18 +3,19 @@ import React from 'react';
 // import css
 import './MovieCard.css';
 
-const MovieCard = props => {
+const MovieCard = ({ movie }) => {
   return (
     <div className="card">
-      <div className="poster">
-        <img
-          src={`http://image.tmdb.org/t/p/w154/${props.movie.poster_path}`}
-          alt="poster"
-        />
-      </div>
-      <div className="info">
-        <h3>{props.movie.original_title}</h3>
-        <p>{props.movie.release_date}</p>
+      <img
+        src={`http://image.tmdb.org/t/p/w154/${movie.poster_path}`}
+        alt="Movie poster"
+        style={{ width: '100%' }}
+      />
+      <div className="container">
+        <h4>
+          <b>{movie.title}</b>
+        </h4>
+        <p>({movie.release_date.split('-')[0]})</p>
       </div>
     </div>
   );
