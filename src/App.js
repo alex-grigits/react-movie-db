@@ -1,18 +1,154 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
+import React, { PureComponent } from 'react';
+
+// custom components
+import SearchBar from './components/SearchBar/SearchBar';
+import SearchResults from './components/SearchResults/SearchResults';
+import Pagination from './components/Pagination/Pagination';
+
+// styles
 import './App.css';
 
-class App extends Component {
+const api_key = '5874acfd11651a28c55771624f7021f4';
+const current_date = new Date().toLocaleDateString();
+
+function formatDate(date) {
+  var d = new Date(date),
+    month = '' + (d.getMonth() + 1),
+    day = '' + d.getDate(),
+    year = d.getFullYear();
+
+  if (month.length < 2) month = '0' + month;
+  if (day.length < 2) day = '0' + day;
+
+  return [year, month, day].join('-');
+}
+
+class App extends PureComponent {
+  state = {
+    inputValue: '',
+    searchedMovies: [],
+    page: 1,
+    total_pages: 1,
+    isLatestMoviesDisplay: true
+  };
+
+  componentDidMount() {
+    this.getLatestMovies();
+  }
+
+  handleInput = event => {
+    this.setState({
+      inputValue: event.target.value
+    });
+  };
+
+  handleKeyDown = event => {
+    console.log(this.state.inputValue);
+    if (event.keyCode === 13 && this.state.inputValue !== '') {
+      this.setState(
+        {
+          inputValue: event.target.value,
+          page: 1
+        },
+        () => this.getMoviesByTitle()
+      );
+    }
+  };
+
+  getMoviesByTitle = () => {
+    fetch(
+      `https://api.themoviedb.org/3/search/movie?api_key=5874acfd11651a28c55771624f7021f4&language=en-US&query=${
+        this.state.inputValue
+      }&page=${this.state.page}`
+    )
+      .then(res => res.json())
+      .then(data => {
+        this.setState(
+          {
+            searchedMovies: data.results,
+            total_pages: data.total_pages,
+            isLatestMoviesDisplay: false
+          },
+          () => console.log(this.state.searchedMovies)
+        );
+      })
+      .catch(err => console.log(err));
+  };
+
+  getLatestMovies = () => {
+    fetch(
+      `https://api.themoviedb.org/3/discover/movie?api_key=5874acfd11651a28c55771624f7021f4&language=en-US&sort_by=release_date.desc&primary_release_date.lte=${formatDate(
+        current_date
+      )}&page=${this.state.page}`
+    )
+      .then(res => res.json())
+      .then(data => {
+        this.setState(
+          {
+            searchedMovies: data.results,
+            total_pages: data.total_pages,
+            isLatestMoviesDisplay: true
+          },
+          () => console.log(this.state)
+        );
+      })
+      .catch(err => console.log(err));
+  };
+
+  handlePrevPage = () => {
+    this.setState(
+      {
+        page: this.state.page - 1
+      },
+      () => {
+        this.state.isLatestMoviesDisplay
+          ? this.getLatestMovies()
+          : this.getMoviesByTitle();
+      }
+    );
+  };
+
+  handleNextPage = () => {
+    this.setState(
+      {
+        page: this.state.page + 1
+      },
+      () => {
+        this.state.isLatestMoviesDisplay
+          ? this.getLatestMovies()
+          : this.getMoviesByTitle();
+      }
+    );
+  };
+
   render() {
+    const { inputValue, searchedMovies, page, total_pages } = this.state;
+
     return (
       <div className="App">
         <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
+          <h1 className="App-title">Movie search DB</h1>
         </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+        <div className="search-bar-container">
+          <SearchBar
+            handleInput={this.handleInput}
+            inputValue={inputValue}
+            handleKeyDown={this.handleKeyDown}
+          />
+        </div>
+        <Pagination
+          handlePrevPage={this.handlePrevPage}
+          handleNextPage={this.handleNextPage}
+          page={page}
+          total={total_pages}
+        />
+        <SearchResults movies={searchedMovies} />
+        <Pagination
+          handlePrevPage={this.handlePrevPage}
+          handleNextPage={this.handleNextPage}
+          page={page}
+          total={total_pages}
+        />
       </div>
     );
   }

@@ -1,0 +1,8 @@
+.pagination {
+    margin: 30px;
+}
+
+.current-page {
+    margin: 0 30px;
+    color: #555;
+}
