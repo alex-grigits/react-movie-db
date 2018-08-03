@@ -2,11 +2,13 @@ import React from 'react';
 
 // import css
 import './MovieDetailPage.css';
+import no_poster from '../../images/default_poster.jpg';
 
 class MovieDetailPage extends React.Component {
   state = {
     movie: {}
   };
+
   componentDidMount() {
     this.getMovieDetails();
   }
@@ -19,12 +21,9 @@ class MovieDetailPage extends React.Component {
     )
       .then(res => res.json())
       .then(data => {
-        this.setState(
-          {
-            movie: data
-          },
-          () => console.log(this.state)
-        );
+        this.setState({
+          movie: data
+        });
       })
       .catch(err => console.log(err));
   };
@@ -32,19 +31,55 @@ class MovieDetailPage extends React.Component {
   render() {
     const { movie } = this.state;
 
+    console.log(movie);
+
     return (
       <div className="detail-page">
-        <div className="detail-page-poster">
-          <img
-            src={`http://image.tmdb.org/t/p/original/${movie.poster_path}`}
-            alt="poster"
-          />
-        </div>
-        <div className="detail-page-info">
-          <h1>{movie.title}</h1>
-          <h3>{movie.vote_count}</h3>
-          <p>{movie.overview}</p>
-        </div>
+        <header className="header">
+          <div className="header-title">
+            <h1 className="header-title__main">
+              {movie.title}
+              <span className="header-title__secondary">
+                ({movie.release_date && movie.release_date.split('-')[0]})
+              </span>
+            </h1>
+          </div>
+          <div className="header-subtitle">
+            <h3>
+              Rating: {movie.vote_average}/<span>10</span>
+            </h3>
+          </div>
+        </header>
+        <main className="info">
+          <div className="info-poster col">
+            <img
+              src={
+                movie.poster_path
+                  ? `http://image.tmdb.org/t/p/original/${movie.poster_path}`
+                  : no_poster
+              }
+              alt="poster"
+            />
+          </div>
+          <div className="info-desc col">
+            <span className="info-desc__genres">
+              <b>Genres: </b>
+              {movie.genres &&
+                movie.genres.map((genre, id, genres) => {
+                  return (
+                    <span key={id}>
+                      {genre.name}
+                      {id < genres.length - 1 ? ', ' : ''}
+                    </span>
+                  );
+                })}
+            </span>
+            <p>{movie.overview}</p>
+            <a href={`https://www.themoviedb.org/movie/${movie.id}`}>
+              Go to the movie page
+            </a>
+          </div>
+        </main>
       </div>
     );
   }

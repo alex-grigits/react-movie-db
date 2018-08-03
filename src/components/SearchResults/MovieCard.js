@@ -2,15 +2,16 @@ import React from 'react';
 
 // import css
 import './MovieCard.css';
+import no_poster from '../../images/default_poster.jpg';
 
 const MovieCard = ({ movie }) => {
+  const poster_src = movie.poster_path
+    ? `http://image.tmdb.org/t/p/w342/${movie.poster_path}`
+    : no_poster;
+
   return (
     <div className="card">
-      <img
-        src={`http://image.tmdb.org/t/p/w154/${movie.poster_path}`}
-        alt="Movie poster"
-        style={{ width: '100%' }}
-      />
+      <img src={poster_src} alt="Movie poster" style={{ width: '100%' }} />
       <div className="container">
         <h4>
           <b>{movie.title}</b>

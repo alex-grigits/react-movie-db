@@ -6,11 +6,16 @@ import SearchBar from '../SearchBar/SearchBar';
 import SearchResults from '../SearchResults/SearchResults';
 import Pagination from '../Pagination/Pagination';
 
-// styles
-// import './App.css';
-
 const api_key = '5874acfd11651a28c55771624f7021f4';
 const current_date = new Date().toLocaleDateString();
+
+const styles = {
+  noFound: {
+    marginTop: '50px',
+    fontSize: '26px',
+    color: '#777'
+  }
+};
 
 function formatDate(date) {
   var d = new Date(date),
@@ -45,7 +50,6 @@ class SearchPage extends PureComponent {
   };
 
   handleKeyDown = (event, key) => {
-    console.log(this.state.inputValue);
     if (event.keyCode === 13 && this.state.inputValue !== '') {
       this.setState(
         {
@@ -81,20 +85,17 @@ class SearchPage extends PureComponent {
 
   getLatestMovies = () => {
     fetch(
-      `https://api.themoviedb.org/3/discover/movie?api_key=5874acfd11651a28c55771624f7021f4&language=en-US&sort_by=release_date.desc&primary_release_date.lte=${formatDate(
+      `https://api.themoviedb.org/3/discover/movie?api_key=5874acfd11651a28c55771624f7021f4&language=en-US&sort_by=primary_release_date.desc&primary_release_date.lte=${formatDate(
         current_date
       )}&page=${this.state.page}`
     )
       .then(res => res.json())
       .then(data => {
-        this.setState(
-          {
-            searchedMovies: data.results,
-            total_pages: data.total_pages,
-            isLatestMoviesDisplay: true
-          },
-          () => console.log(this.state)
-        );
+        this.setState({
+          searchedMovies: data.results,
+          total_pages: data.total_pages,
+          isLatestMoviesDisplay: true
+        });
       })
       .catch(err => console.log(err));
   };
@@ -108,6 +109,10 @@ class SearchPage extends PureComponent {
         this.state.isLatestMoviesDisplay
           ? this.getLatestMovies()
           : this.getMoviesByTitle();
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
       }
     );
   };
@@ -121,6 +126,10 @@ class SearchPage extends PureComponent {
         this.state.isLatestMoviesDisplay
           ? this.getLatestMovies()
           : this.getMoviesByTitle();
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
       }
     );
   };
@@ -144,19 +153,29 @@ class SearchPage extends PureComponent {
             handleKeyDown={this.handleKeyDown}
           />
         </div>
-        <Pagination
-          handlePrevPage={this.handlePrevPage}
-          handleNextPage={this.handleNextPage}
-          page={page}
-          total={total_pages}
-        />
-        <SearchResults movies={searchedMovies} match={this.props.match} />
-        <Pagination
-          handlePrevPage={this.handlePrevPage}
-          handleNextPage={this.handleNextPage}
-          page={page}
-          total={total_pages}
-        />
+
+        {searchedMovies.length > 0 ? (
+          <div>
+            <Pagination
+              handlePrevPage={this.handlePrevPage}
+              handleNextPage={this.handleNextPage}
+              page={page}
+              total={total_pages}
+            />
+            {searchedMovies.length !== 0 && (
+              <SearchResults movies={searchedMovies} match={this.props.match} />
+            )}
+
+            <Pagination
+              handlePrevPage={this.handlePrevPage}
+              handleNextPage={this.handleNextPage}
+              page={page}
+              total={total_pages}
+            />
+          </div>
+        ) : (
+          <div style={styles.noFound}>Results not found</div>
+        )}
       </div>
     );
   }
