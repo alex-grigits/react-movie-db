@@ -1,7 +1,7 @@
 # Movie search app
 
 ```bash
-git clone react-movie-db
+git clone git@github.com:alex-grigits/react-movie-db.git
 cd react-movie-db
 npm i
 npm start
